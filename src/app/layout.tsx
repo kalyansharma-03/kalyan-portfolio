@@ -4,6 +4,11 @@ export const metadata: Metadata = {
   title: 'Kalyan Sharma — Software Engineer',
   description: 'Full-stack software engineer working with .NET, React, and thoughtful digital experiences.',
   metadataBase: new URL('https://kalyan-sharma.com.np'),
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
   openGraph: { title: 'Kalyan Sharma — Software Engineer', description: 'Code with perspective. Building thoughtful software, one summit at a time.', url: 'https://kalyan-sharma.com.np', type: 'website' },
 };
 export default function RootLayout({ children }: Readonly<{children: React.ReactNode}>) {

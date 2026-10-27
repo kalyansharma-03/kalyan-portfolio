@@ -39,7 +39,7 @@ function MountainScene({ night }: { night: boolean }) {
     <svg className="mountain-svg" viewBox="0 0 1440 620" preserveAspectRatio="xMidYMax slice" role="presentation">
       <defs><linearGradient id="far" x1="0" y1="0" x2="0" y2="1"><stop stopColor="#5c8178"/><stop offset="1" stopColor="#203d39"/></linearGradient><linearGradient id="near" x1="0" y1="0" x2="0" y2="1"><stop stopColor="#294f48"/><stop offset="1" stopColor="#0c1c1a"/></linearGradient></defs>
       <path d="M0 450 L110 355 190 395 340 205 445 318 570 180 710 340 850 140 980 322 1105 210 1245 380 1360 285 1440 355 V620 H0Z" fill="url(#far)" opacity=".65"/>
-      <path d="M245 305 L340 205 410 288 375 270 352 285 333 251 305 291Z M780 226 L850 140 920 241 872 209 854 223 837 186 810 219Z M1050 270 L1105 210 1157 279 1114 254 1096 265 1088 243Z" fill="#b9c9b9" opacity=".72"/>
+      <path d="M110 380 L190 270 L260 380 L205 350 L164 368 L130 341 Z M480 370 L570 180 L660 370 L600 330 L540 355 L500 326 Z M790 390 L850 140 L910 390 L860 360 L835 372 L810 347 Z M1075 385 L1105 210 L1170 385 L1125 350 L1092 366 L1080 338 Z" fill="#dfece3" opacity=".78"/>
       <path d="M0 515 L130 405 275 510 430 350 590 485 735 310 870 430 1030 290 1190 455 1340 345 1440 420 V620 H0Z" fill="url(#near)"/>
       <path d="M0 570 L180 495 320 540 505 440 650 555 835 450 1000 535 1190 435 1440 525 V620 H0Z" fill="#0a1817"/>
       <path d="M0 595 Q360 550 720 590 T1440 575" stroke="#9dca9d" strokeOpacity=".22" strokeWidth="1" fill="none"/>
@@ -81,11 +81,34 @@ export default function Home() {
     document.getElementById(id)?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
   };
   useEffect(() => {
-    const preferredNight = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    // Start with the signature sunset scene; allow visitors to choose night.
-    void preferredNight;
-    setMotionEnabled(!window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    const storedTheme = window.localStorage.getItem("kalyan-theme");
+    const storedMotion = window.localStorage.getItem("kalyan-motion");
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (storedTheme === "night") {
+      setNight(true);
+    } else if (storedTheme === "day") {
+      setNight(false);
+    } else {
+      setNight(prefersDark);
+    }
+
+    if (storedMotion === "off") {
+      setMotionEnabled(false);
+    } else {
+      setMotionEnabled(!reducedMotion);
+    }
   }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem("kalyan-theme", night ? "night" : "day");
+  }, [night]);
+
+  useEffect(() => {
+    window.localStorage.setItem("kalyan-motion", motionEnabled ? "on" : "off");
+  }, [motionEnabled]);
+
   const copyEmail = async () => {
     try {
       await navigator.clipboard.writeText(contact.email);
@@ -115,7 +138,9 @@ export default function Home() {
     update(); window.addEventListener("scroll", update, { passive: true });
     return () => window.removeEventListener("scroll", update);
   }, []);
-  return <main id="top">
+  return <>
+    <a href="#main-content" className="skip-link">Skip to content</a>
+    <main id="top">
     <div className="progress" style={{ width: `${progress}%` }} />
     <div className="summit-meter" aria-label={`Expedition progress ${Math.round(progress)} percent`}>
       <MountainSnow size={15} aria-hidden="true" /> <span>SUMMIT {Math.round(progress)}%</span>
@@ -125,12 +150,12 @@ export default function Home() {
       <nav className={`navlinks ${menuOpen ? "open" : ""}`} aria-label="Main navigation">
         {[ ["About", "#about"], ["Work", "#work"], ["Stack", "#stack"], ["Experience", "#experience"] ].map(([label, url]) => <a key={url} href={url} onClick={() => setMenuOpen(false)}>{label}</a>)}
       </nav>
-      <div className="nav-tools"><button type="button" className="scene-toggle" onClick={() => setNight(value => !value)} aria-label={night ? "Switch to sunset scene" : "Switch to night scene"} title={night ? "Sunset mode" : "Night mode"}>{night ? <Sun size={17}/> : <Moon size={17}/>}<span>{night ? "Sunset" : "Night"}</span></button>
+      <div className="nav-tools"><button type="button" className="scene-toggle" onClick={() => setNight(value => !value)} aria-label={night ? "Switch to sunset scene" : "Switch to night scene"} aria-pressed={night} title={night ? "Sunset mode" : "Night mode"}>{night ? <Sun size={17}/> : <Moon size={17}/>}<span>{night ? "Sunset" : "Night"}</span></button>
       <button type="button" className="command-trigger" onClick={() => setCommandOpen(true)} aria-label="Open quick navigation"> <Search size={15}/> <span>Quick jump</span> <kbd>Ctrl K</kbd></button>
       </div><a href="#contact" className="nav-contact">Let&apos;s talk <ArrowUpRight size={15}/></a>
       <button className="menu" aria-label={menuOpen ? "Close menu" : "Open menu"} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X/> : <Menu/>}</button>
     </div></header>
-    <section className={`hero ${night ? "hero-night" : ""}`} id="home" onPointerMove={event => {
+    <section className={`hero ${night ? "hero-night" : ""}`} id="main-content" onPointerMove={event => {
       if (!motionEnabled || event.pointerType !== "mouse" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
       const r = event.currentTarget.getBoundingClientRect();
       setMountainShift({ x: ((event.clientX - r.left) / r.width - 0.5) * 16, y: ((event.clientY - r.top) / r.height - 0.5) * 10 });
@@ -151,7 +176,7 @@ export default function Home() {
     <section className="section work" id="work"><div className="shell"><div className="eyebrow"><span>02 /</span> SELECTED EXPERIENCE</div><div className="section-top"><h2>Work that<br/><span>matters.</span></h2><p>Selected product domains I&apos;ve contributed to. Details are kept high-level to respect confidentiality.</p></div><div className="work-grid">{projects.map(p => { const Icon = p.icon; return <article className="work-card" key={p.no}><div className="work-meta"><span>{p.no} / {p.type}</span><Icon size={31} strokeWidth={1.4}/></div><div><h3>{p.name}</h3><p>{p.description}</p><div className="chips">{p.stack.map(s => <span key={s}>{s}</span>)}</div></div></article>; })}</div></div></section>
     <section className="section shell stack-grid" id="stack"><div><div className="eyebrow"><span>03 /</span> MY TOOLKIT</div><h2>Tools for<br/><span>the climb.</span></h2><p>A practical mix of technologies for designing, developing, and delivering dependable products.</p></div><div><div className="skill-grid">{skills.map((skill, i) => <button type="button" aria-pressed={selectedSkill === skill} onClick={() => setSelectedSkill(skill)} className={`skill ${selectedSkill === skill ? "selected" : ""}`} key={skill}><span>{String(i + 1).padStart(2, "0")}</span><strong>{skill}</strong>{i % 3 === 0 ? <Code2 size={18}/> : i % 3 === 1 ? <Layers size={18}/> : <Database size={18}/>}</button>)}</div><div className="skill-detail" aria-live="polite"><span>FIELD NOTES / {selectedSkill}</span><p>{skillDetails[selectedSkill]}</p></div></div></section>
     <section className="section journey" id="experience"><div className="shell"><div className="eyebrow"><span>04 /</span> THE JOURNEY</div><h2>Still climbing<span>.</span></h2><div className="journey-list"><div className="journey-row"><span>2026 — NOW</span><div><h3>Software Engineer</h3><p>IQVIA / Cedar Gate Technologies</p><small>Healthcare management · .NET · MVC · React</small></div><ArrowUpRight size={21}/></div><div className="journey-row"><span>PREVIOUSLY</span><div><h3>Software Developer</h3><p>Enterprise software &amp; fintech</p><small>Full-stack development · C# · React · TypeScript</small></div><ArrowUpRight size={21}/></div></div></div></section>
-    <section className="contact" id="contact"><div className="shell contact-inner"><div className="eyebrow"><span>05 /</span> SAY HELLO</div><h2>Let&apos;s make<br/><em>something good.</em></h2><p>Have a project, an idea, or just want to talk tech? My inbox is open.</p><div className="contact-actions"><a className="button primary" href={`mailto:${contact.email}`}>Start a conversation <ArrowUpRight size={18}/></a><button type="button" className="copy-email" onClick={copyEmail} aria-label={copied ? "Email copied to clipboard" : "Copy email address"} title={copied ? "Email copied" : "Copy email address"}>{copied ? <Check size={17}/> : <Copy size={17}/>}</button></div><div className="socials"><a href={contact.github} target="_blank" rel="noopener noreferrer"><FaGithub size={19}/> GitHub <ExternalLink size={13}/></a><a href={contact.linkedin} target="_blank" rel="noopener noreferrer"><FaLinkedin size={19}/> LinkedIn <ExternalLink size={13}/></a><a href={`mailto:${contact.email}`}>Email <ArrowUpRight size={15}/></a></div></div></section>
+    <section className="contact" id="contact"><div className="shell contact-inner"><div className="eyebrow"><span>05 /</span> SAY HELLO</div><h2>Let&apos;s make<br/><em>something good.</em></h2><p>Have a project, an idea, or just want to talk tech? My inbox is open.</p><div className="contact-actions"><a className="button primary" href={`mailto:${contact.email}`}>Start a conversation <ArrowUpRight size={18}/></a><button type="button" className="copy-email" onClick={copyEmail} aria-label={copied ? "Email copied to clipboard" : "Copy email address"} title={copied ? "Email copied" : "Copy email address"}>{copied ? <><Check size={17}/><span className="copy-status">Copied</span></> : <Copy size={17}/>}</button></div><div className="socials"><a href={contact.github} target="_blank" rel="noopener noreferrer"><FaGithub size={19}/> GitHub <ExternalLink size={13}/></a><a href={contact.linkedin} target="_blank" rel="noopener noreferrer"><FaLinkedin size={19}/> LinkedIn <ExternalLink size={13}/></a><a href={`mailto:${contact.email}`}>Email <ArrowUpRight size={15}/></a></div></div></section>
     {trailOpen && <div className="trail-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) setTrailOpen(false); }}>
       <section className="trail-dialog" role="dialog" aria-modal="true" aria-labelledby="trail-title" aria-describedby="trail-description">
         <div className="trail-dialog-top"><span><MountainSnow size={17}/> THE DEVELOPER'S EXPEDITION</span><button type="button" onClick={() => setTrailOpen(false)} aria-label="Close expedition"><X size={20}/></button></div>
@@ -170,6 +195,8 @@ export default function Home() {
         <div className="command-hint">Press Enter to jump · Esc to close</div>
       </div>
     </div>}
+    <div className="sr-only" aria-live="polite" aria-atomic="true">{copied ? "Email address copied to clipboard." : ""}</div>
     <footer className="shell footer"><span>© {currentYear} Kalyan Sharma</span><span>Built with care · Kathmandu, Nepal</span><a href="#top">Back to top ↑</a></footer>
-  </main>;
+  </main>
+  </>;
 }
