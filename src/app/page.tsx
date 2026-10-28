@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowDownRight, ArrowUpRight, ArrowRight, Menu, X, MapPin, MountainSnow, HeartPulse, Landmark, Workflow, Code2, Database, Layers, ExternalLink, Search, XCircle, Compass, Flag, Sparkles, Moon, Sun, Copy, Check, Volume2, VolumeX, FileText, Download } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, ArrowRight, Menu, X, MapPin, MountainSnow, HeartPulse, Landmark, Workflow, Code2, Database, Layers, ExternalLink, Search, XCircle, Compass, Flag, Sparkles, Moon, Sun, Copy, Check, Volume2, VolumeX, FileText, Download, Music2 } from "lucide-react";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 
 const contact = {
@@ -26,13 +26,19 @@ const trailStops = [
   { title: "The Ridge", elevation: "02 / THE CHALLENGE", fact: "My work spans healthcare, banking, and enterprise collaboration products.", detail: "Different terrain, same approach: thoughtful problem-solving." },
   { title: "The Summit", elevation: "03 / THE VIEW", fact: "I'm always learning new tools and ways to make software more reliable and useful.", detail: "The best part of reaching a summit? Discovering the next one." },
 ];
-const quizQuestions = [
-  { prompt: "Which technology is the backbone of my backend toolkit?", options: ["C# / .NET", "Ruby on Rails", "Go"], answer: "C# / .NET", note: "That's it — C# and .NET are a big part of my backend work." },
-  { prompt: "Which library do I use to build interactive interfaces?", options: ["React", "jQuery", "Svelte"], answer: "React", note: "Correct — React is one of my go-to tools for user interfaces." },
-  { prompt: "Where am I based?", options: ["Kathmandu, Nepal", "Toronto, Canada", "Oslo, Norway"], answer: "Kathmandu, Nepal", note: "You got it — I work from Kathmandu, Nepal." },
+const trailGameStops = [
+  { place: "Namche Bazaar", region: "KHUMBU REGION", prompt: "The trail climbs quickly above Namche. What is the thoughtful next move?", choices: ["Build in time to rest and adjust to the altitude", "Race ahead and skip the rest stop"], answer: 0, success: "Good call. A steady pace and time to acclimatize matter on high-altitude routes.", retry: "Taking it slowly is the wiser choice on a high-altitude route." },
+  { place: "Tengboche", region: "ON THE RIDGE", prompt: "The weather starts to change. What should your team do?", choices: ["Ignore the forecast and keep pushing", "Check local conditions and follow your guide's advice"], answer: 1, success: "Exactly. Local conditions can change quickly; listen to experienced local guides.", retry: "Checking conditions and listening to local guides is the safer move." },
+  { place: "Everest Base Camp", region: "THE HIGH TRAIL", prompt: "A shortcut leaves the marked route. Which way do you go?", choices: ["Stay on the established route with your group", "Try the unmarked shortcut alone"], answer: 0, success: "Summit sense! Staying together and on established routes is the better call.", retry: "Stick with your group and the established route rather than taking an unknown shortcut." },
+];
+const scrollTrailStops = [
+  { label: "Base camp", id: "about" },
+  { label: "First ridge", id: "work" },
+  { label: "High camp", id: "experience" },
+  { label: "Summit", id: "contact" },
 ];
 const projects = [
-  { no: "01", icon: HeartPulse, name: "Healthcare management", type: "HEALTHCARE / ENTERPRISE", description: "Building reliable care-management workflows across backend services and responsive interfaces.", stack: [".NET", "MVC", "React"] },
+  { no: "01", icon: HeartPulse, name: "Healthcare management", type: "HEALTHCARE / ENTERPRISE", description: "Building reliable care-management workflows across backend services & responsive interfaces.", stack: [".NET", "MVC", "React"] },
   { no: "02", icon: Landmark, name: "Fintech & banking", type: "FINANCIAL TECHNOLOGY", description: "Developing customer-account services and features that make everyday banking simpler.", stack: ["C#", "REST APIs", "SQL"] },
   { no: "03", icon: Workflow, name: "Enterprise collaboration", type: "PRODUCTIVITY / WORKFLOWS", description: "Crafting agenda, decision and protocol experiences for complex team collaboration.", stack: ["React", "TypeScript", ".NET"] },
 ];
@@ -47,6 +53,14 @@ function MountainScene({ night }: { night: boolean }) {
       <path d="M110 380 L190 270 L260 380 L205 350 L164 368 L130 341 Z M480 370 L570 180 L660 370 L600 330 L540 355 L500 326 Z M790 390 L850 140 L910 390 L860 360 L835 372 L810 347 Z M1075 385 L1105 210 L1170 385 L1125 350 L1092 366 L1080 338 Z" fill="#dfece3" opacity=".78"/>
       <path d="M0 515 L130 405 275 510 430 350 590 485 735 310 870 430 1030 290 1190 455 1340 345 1440 420 V620 H0Z" fill="url(#near)"/>
       <path d="M0 570 L180 495 320 540 505 440 650 555 835 450 1000 535 1190 435 1440 525 V620 H0Z" fill="#0a1817"/>
+      <path d="M850 139 V179" stroke="#28485a" strokeWidth="3" strokeLinecap="round"/>
+      <g className="nepal-flag-cloth">
+        <path d="M849 137 L895 150 L878 160 L901 173 L879 185 L849 174 Z" fill="#003893"/>
+        <path d="M852 141 L890 152 L874 159 L896 172 L878 180 L852 170 Z" fill="#dc143c"/>
+        <path d="M860 145 A6 6 0 1 0 869 152 A5 5 0 0 1 860 145 Z" fill="#fff"/>
+        <circle cx="863" cy="164" r="2.4" fill="#fff"/>
+        <path d="M863 158.5 V156.5 M863 171.5 V169.5 M857.5 164 H855.5 M870.5 164 H868.5 M859.1 160.1 L857.7 158.7 M868.3 169.3 L866.9 167.9 M866.9 160.1 L868.3 158.7 M857.7 169.3 L859.1 167.9" stroke="#fff" strokeWidth="1.2" strokeLinecap="round"/>
+      </g>
       <path d="M0 595 Q360 550 720 590 T1440 575" stroke="#9dca9d" strokeOpacity=".22" strokeWidth="1" fill="none"/>
     </svg>
     <div className="landscape-label">27°59′ N — THE HIMALAYAS</div>
@@ -61,6 +75,7 @@ export default function Home() {
   const [trailOpen, setTrailOpen] = useState(false);
   const [activeStop, setActiveStop] = useState(0);
   const [visitedStops, setVisitedStops] = useState<number[]>([]);
+  const [activeTrailStop, setActiveTrailStop] = useState(0);
   const visitStop = (index: number) => {
     setActiveStop(index);
     setVisitedStops(previous => previous.includes(index) ? previous : [...previous, index]);
@@ -70,9 +85,9 @@ export default function Home() {
   const [commandOpen, setCommandOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [selectedSkill, setSelectedSkill] = useState("C# / .NET");
-  const [quizIndex, setQuizIndex] = useState(0);
-  const [quizAnswer, setQuizAnswer] = useState<string | null>(null);
-  const [quizScore, setQuizScore] = useState(0);
+  const [gameStage, setGameStage] = useState(0);
+  const [gameChoice, setGameChoice] = useState<number | null>(null);
+  const [gameScore, setGameScore] = useState(0);
   const [currentYear, setCurrentYear] = useState(2026);
   const [mountainShift, setMountainShift] = useState({ x: 0, y: 0 });
   const destinations = [
@@ -149,13 +164,35 @@ export default function Home() {
     update(); window.addEventListener("scroll", update, { passive: true });
     return () => window.removeEventListener("scroll", update);
   }, []);
+  useEffect(() => {
+    const observer = new IntersectionObserver(entries => {
+      const visibleStop = entries
+        .filter(entry => entry.isIntersecting)
+        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+      if (!visibleStop) return;
+      const index = scrollTrailStops.findIndex(stop => stop.id === visibleStop.target.id);
+      if (index >= 0) setActiveTrailStop(index);
+    }, { rootMargin: "-30% 0px -55% 0px" });
+    scrollTrailStops.forEach(stop => {
+      const section = document.getElementById(stop.id);
+      if (section) observer.observe(section);
+    });
+    return () => observer.disconnect();
+  }, []);
   return <>
     <a href="#main-content" className="skip-link">Skip to content</a>
-    <main id="top">
+    <main id="top" className={motionEnabled ? "motion-enabled" : "motion-off"}>
     <div className="progress" style={{ width: `${progress}%` }} />
     <div className="summit-meter" aria-label={`Expedition progress ${Math.round(progress)} percent`}>
       <MountainSnow size={15} aria-hidden="true" /> <span>SUMMIT {Math.round(progress)}%</span>
     </div>
+    <nav className={`scroll-trail ${progress > 3 && progress < 98 ? "visible" : ""}`} aria-label="Expedition sections">
+      <svg viewBox="0 0 100 220" preserveAspectRatio="none" aria-hidden="true">
+        <path className="scroll-trail-base" d="M22 14 C82 42 19 70 76 94 S24 143 78 165 S42 196 78 208" pathLength="1000"/>
+        <path className="scroll-trail-progress" d="M22 14 C82 42 19 70 76 94 S24 143 78 165 S42 196 78 208" pathLength="1000" style={{ strokeDashoffset: 1000 - progress * 10 }}/>
+      </svg>
+      {scrollTrailStops.map((stop, index) => <a key={stop.id} href={`#${stop.id}`} className={`scroll-trail-stop ${activeTrailStop === index ? "active" : ""}`} style={{ top: `${6 + index * 29}%`, left: `${[22, 76, 42, 78][index]}%` }} aria-label={`Scroll to ${stop.label}`} aria-current={activeTrailStop === index ? "location" : undefined}><span>{index + 1}</span><small>{stop.label}</small></a>)}
+    </nav>
     <header className="site-header"><div className="shell nav">
       <a href="#top" className="logo" aria-label="Kalyan Sharma home"><MountainSnow size={25} strokeWidth={1.7}/> kalyan<span className="logo-dot">.</span></a>
       <nav className={`navlinks ${menuOpen ? "open" : ""}`} aria-label="Main navigation">
@@ -183,7 +220,7 @@ export default function Home() {
       <div className="hero-footer"><span>FULL-STACK DEVELOPMENT / 2026</span><a href="#about">SCROLL TO EXPLORE <ArrowDownRight size={17}/></a></div>
       <div className="hero-controls"><button type="button" onClick={() => setMotionEnabled(v => !v)} aria-pressed={!motionEnabled}>{motionEnabled ? <Volume2 size={15}/> : <VolumeX size={15}/>} {motionEnabled ? "Motion on" : "Motion off"}</button><span>TRY THE FLAG ON THE MOUNTAIN ↗</span></div>
     </div></section>
-    <section className="section shell about-grid" id="about"><div><div className="eyebrow"><span>01 /</span> THE PERSON BEHIND THE CODE</div><h2>Building with<br/><span>intention.</span></h2></div><div className="about-copy"><p>I&apos;m a full-stack software engineer who enjoys solving complex problems with simple, maintainable solutions.</p><p>From healthcare systems to fintech and enterprise collaboration, I work across APIs, data, and user interfaces to build software people can rely on.</p><div className="location"><MapPin size={17}/> Based in Kathmandu, Nepal</div></div></section>
+    <section className="section shell about-grid" id="about"><div><div className="eyebrow"><span>01 /</span> THE PERSON BEHIND THE CODE</div><h2>Building with<br/><span>intention.</span></h2></div><div className="about-copy"><p>I&apos;m a full-stack software engineer who enjoys solving complex problems with simple, maintainable solutions.</p><p>From healthcare systems to fintech and enterprise collaboration, I work across APIs, data, and user interfaces to build software people can rely on.</p><div className="location"><MapPin size={17}/> Based in Kathmandu, Nepal</div><div className="music-note"><Music2 size={19} aria-hidden="true"/><span><small>OFF THE CLOCK</small><strong>Radiohead on repeat</strong></span><i aria-hidden="true"><b/><b/><b/><b/><b/></i></div></div></section>
     <section className="section field-notes" id="field-notes"><div className="shell"><div className="eyebrow"><span>02 /</span> A FEW FIELD NOTES</div><div className="section-top"><h2>Beyond the<br/><span>keyboard.</span></h2><p>A little more about how I think, what I value, and the perspective I bring to the work.</p></div><div className="field-note-grid">
       <article className="field-note-card"><div className="field-note-top"><span>01 / STAY CURIOUS</span><Compass size={21}/></div><h3>Follow the interesting problem.</h3><p>I like learning how the whole product fits together, from the data underneath it to the details people interact with.</p><span className="field-note-tag">ASK WHY · KEEP EXPLORING</span></article>
       <article className="field-note-card"><div className="field-note-top"><span>02 / TAKE THE LONG VIEW</span><MountainSnow size={21}/></div><h3>Good work is a steady climb.</h3><p>Mountains are a reminder that meaningful progress comes from patience, preparation, and taking one thoughtful step at a time.</p><span className="field-note-tag">PERSPECTIVE · PATIENCE</span></article>
@@ -193,14 +230,42 @@ export default function Home() {
     <section className="section shell stack-grid" id="stack"><div><div className="eyebrow"><span>04 /</span> MY TOOLKIT</div><h2>Tools for<br/><span>the climb.</span></h2><p>A practical mix of technologies for designing, developing, and delivering dependable products.</p></div><div><div className="skill-grid">{skills.map((skill, i) => <button type="button" aria-pressed={selectedSkill === skill} onClick={() => setSelectedSkill(skill)} className={`skill ${selectedSkill === skill ? "selected" : ""}`} key={skill}><span>{String(i + 1).padStart(2, "0")}</span><strong>{skill}</strong>{i % 3 === 0 ? <Code2 size={18}/> : i % 3 === 1 ? <Layers size={18}/> : <Database size={18}/>}</button>)}</div><div className="skill-detail" aria-live="polite"><span>FIELD NOTES / {selectedSkill}</span><p>{skillDetails[selectedSkill]}</p></div></div></section>
     <section className="section journey" id="experience"><div className="shell"><div className="eyebrow"><span>05 /</span> THE JOURNEY</div><h2>Still climbing<span>.</span></h2><div className="journey-list"><div className="journey-row"><span>2026 — NOW</span><div><h3>Software Engineer</h3><p>IQVIA / Cedar Gate Technologies</p><small>Healthcare management · .NET · MVC · React</small></div><ArrowUpRight size={21}/></div><div className="journey-row"><span>PREVIOUSLY</span><div><h3>Software Developer</h3><p>Enterprise software &amp; fintech</p><small>Full-stack development · C# · React · TypeScript</small></div><ArrowUpRight size={21}/></div></div></div></section>
     <section className="section resume-section" id="resume"><div className="shell resume-card"><div className="resume-copy"><div className="eyebrow"><span>06 /</span> THE SHORT VERSION</div><h2>Want the<br/><span>full story?</span></h2><p>Download my resume for a concise overview of my experience, skills, and the work I&apos;ve contributed to.</p><a className="button primary" href="/KalyanSharma.pdf" download="KalyanSharma.pdf">Download my resume <Download size={17}/></a></div><div className="resume-preview" aria-hidden="true"><div className="resume-sheet"><span className="resume-sheet-label">KALYAN SHARMA / SOFTWARE ENGINEER</span><div className="resume-sheet-line resume-sheet-heading"/><div className="resume-sheet-line resume-sheet-heading short"/><div className="resume-sheet-accent"/><div className="resume-sheet-line"/><div className="resume-sheet-line medium"/><div className="resume-sheet-line"/><div className="resume-sheet-line short"/><div className="resume-sheet-bottom"><span>EXPERIENCE</span><span>SKILLS</span><span>EDUCATION</span></div></div><span className="resume-stamp"><FileText size={17}/> RESUME / PDF</span></div></div></section>
-    <section className="section playground" id="playground"><div className="shell playground-grid"><div className="playground-copy"><div className="eyebrow"><span>07 /</span> A QUICK TRAIL BREAK</div><h2>Stack<br/><span>knowledge?</span></h2><p>Three quick questions about my toolkit and where I work. See how many you can get right.</p><div className="playground-score"><Sparkles size={16}/> SCORE <strong>{quizScore} / {quizQuestions.length}</strong></div></div><div className="quiz-card" aria-live="polite">
-      {quizIndex < quizQuestions.length ? <>
-        <div className="quiz-card-top"><span>QUESTION {String(quizIndex + 1).padStart(2, "0")} / {String(quizQuestions.length).padStart(2, "0")}</span><span>{quizScore} POINT{quizScore === 1 ? "" : "S"}</span></div>
-        <h3>{quizQuestions[quizIndex].prompt}</h3>
-        <div className="quiz-options">{quizQuestions[quizIndex].options.map(option => <button key={option} type="button" className={`quiz-option ${quizAnswer === option ? option === quizQuestions[quizIndex].answer ? "correct" : "incorrect" : ""}`} onClick={() => { if (quizAnswer !== null) return; setQuizAnswer(option); if (option === quizQuestions[quizIndex].answer) setQuizScore(score => score + 1); }} disabled={quizAnswer !== null} aria-pressed={quizAnswer === option}>{option}{quizAnswer === option && (option === quizQuestions[quizIndex].answer ? <Check size={16}/> : <X size={16}/>)}</button>)}</div>
-        {quizAnswer !== null && <div className="quiz-feedback"><p>{quizAnswer === quizQuestions[quizIndex].answer ? quizQuestions[quizIndex].note : `Not quite — ${quizQuestions[quizIndex].note}`}</p><button type="button" className="button secondary" onClick={() => { setQuizIndex(index => index + 1); setQuizAnswer(null); }}>{quizIndex === quizQuestions.length - 1 ? "See my score" : "Next question"} <ArrowRight size={16}/></button></div>}
-      </> : <div className="quiz-result"><Sparkles size={28}/><span>TRAIL BREAK COMPLETE</span><h3>{quizScore === quizQuestions.length ? "Perfect climb!" : quizScore > 0 ? "Nice work!" : "Good warm-up!"}</h3><p>You scored {quizScore} out of {quizQuestions.length}. Thanks for exploring a little more about me.</p><button type="button" className="button primary" onClick={() => { setQuizIndex(0); setQuizAnswer(null); setQuizScore(0); }}>Play again <ArrowRight size={16}/></button></div>}
-    </div></div></section>
+    <section className="section playground" id="playground">
+      <div className="shell playground-grid">
+        <div className="playground-copy">
+          <div className="eyebrow"><span>07 /</span> A NEPAL MOUNTAIN MINI-GAME</div>
+          <h2>Find your<br/><span>trail sense.</span></h2>
+          <p>Make three thoughtful choices on a playful route through the Khumbu. How many good calls can you make?</p>
+          <div className="playground-score"><MountainSnow size={16}/> TRAIL SCORE <strong>{gameScore} / {trailGameStops.length}</strong></div>
+          <small className="game-disclaimer">A lighthearted game, not real hiking or altitude-safety advice.</small>
+        </div>
+        <div className="trail-game" aria-live="polite">
+          <div className="game-route" aria-label={`Trail progress: ${Math.min(gameStage + (gameChoice === null ? 0 : 1), trailGameStops.length)} of ${trailGameStops.length} stops`}>
+            <svg viewBox="0 0 220 70" preserveAspectRatio="none" aria-hidden="true">
+              <path className="game-route-base" d="M8 55 C47 54 46 20 83 23 S126 57 155 43 S183 14 212 17" pathLength="1000"/>
+              <path className="game-route-progress" d="M8 55 C47 54 46 20 83 23 S126 57 155 43 S183 14 212 17" pathLength="1000" style={{ strokeDashoffset: 1000 - (Math.min(gameStage + (gameChoice === null ? 0 : 1), trailGameStops.length) / trailGameStops.length) * 1000 }}/>
+              {[ [8,55], [83,23], [155,43], [212,17] ].map(([x, y], index) => <circle key={index} className={index <= gameStage ? "game-waypoint reached" : "game-waypoint"} cx={x} cy={y} r="4"/> )}
+            </svg>
+            <span>{gameStage < trailGameStops.length ? "KHUMBU TRAIL · NEPAL" : "ROUTE COMPLETE"}</span>
+          </div>
+          {gameStage < trailGameStops.length ? (() => {
+            const stop = trailGameStops[gameStage];
+            const answeredCorrectly = gameChoice === stop.answer;
+            return <div className="game-stop" key={stop.place}>
+              <div className="game-stop-meta"><span>STOP {String(gameStage + 1).padStart(2, "0")} / {String(trailGameStops.length).padStart(2, "0")}</span><span>{stop.region}</span></div>
+              <h3>{stop.place}</h3>
+              <p>{stop.prompt}</p>
+              <div className="game-choices">{stop.choices.map((choice, index) => <button key={choice} type="button" className={`game-choice ${gameChoice === index ? answeredCorrectly ? "correct" : "incorrect" : ""}`} onClick={() => { if (gameChoice !== null) return; setGameChoice(index); if (index === stop.answer) setGameScore(score => score + 1); }} disabled={gameChoice !== null} aria-pressed={gameChoice === index}>{choice}{gameChoice === index && (answeredCorrectly ? <Check size={17}/> : <X size={17}/>)}</button>)}</div>
+              {gameChoice !== null && <div className="game-feedback"><p>{gameChoice === stop.answer ? stop.success : stop.retry}</p><button type="button" className="button primary" onClick={() => { setGameStage(stage => stage + 1); setGameChoice(null); }}>{gameStage === trailGameStops.length - 1 ? "Finish the trail" : "Next stop"} <ArrowRight size={16}/></button></div>}
+            </div>;
+          })() : <div className="game-result">
+            <Sparkles size={28}/><span>TRAIL COMPLETE</span><h3>{gameScore === trailGameStops.length ? "Summit sense!" : gameScore > 0 ? "A steady climb!" : "Every trail teaches."}</h3>
+            <p>You made {gameScore} of {trailGameStops.length} thoughtful calls on the Khumbu trail.</p>
+            <button type="button" className="button primary" onClick={() => { setGameStage(0); setGameChoice(null); setGameScore(0); }}>Hike again <ArrowRight size={16}/></button>
+          </div>}
+        </div>
+      </div>
+    </section>
     <section className="contact" id="contact"><div className="shell contact-inner"><div className="eyebrow"><span>08 /</span> SAY HELLO</div><h2>Let&apos;s make<br/><em>something good.</em></h2><p>Have a project, an idea, or just want to talk tech? My inbox is open.</p><div className="contact-actions"><a className="button primary" href={`mailto:${contact.email}`}>Start a conversation <ArrowUpRight size={18}/></a><button type="button" className="copy-email" onClick={copyEmail} aria-label={copied ? "Email copied to clipboard" : "Copy email address"} title={copied ? "Email copied" : "Copy email address"}>{copied ? <><Check size={17}/><span className="copy-status">Copied</span></> : <Copy size={17}/>}</button></div><div className="socials"><a href={contact.github} target="_blank" rel="noopener noreferrer"><FaGithub size={19}/> GitHub <ExternalLink size={13}/></a><a href={contact.linkedin} target="_blank" rel="noopener noreferrer"><FaLinkedin size={19}/> LinkedIn <ExternalLink size={13}/></a><a href={`mailto:${contact.email}`}>Email <ArrowUpRight size={15}/></a></div></div></section>
     {trailOpen && <div className="trail-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) setTrailOpen(false); }}>
       <section className="trail-dialog" role="dialog" aria-modal="true" aria-labelledby="trail-title" aria-describedby="trail-description">
